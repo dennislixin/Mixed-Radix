@@ -2,7 +2,30 @@ import java.util.*;
 
 public class MixedRadixTest{
   public static void main(String[] args){
+    MixedRadix rmb = new MixedRadix(24, 60);
+    rmb.add(2, 13, 40);
+    System.out.println(rmb);
 
+    rmb.add(2, 13, 40);
+    System.out.println(rmb);
+
+    rmb.add(2, 13, 40);
+    System.out.println(rmb);
+
+    rmb.sub(2, 13, 40);
+    System.out.println(rmb);
+
+    rmb.sub(2, 13, 40);
+    System.out.println(rmb);
+
+    rmb.sub(2, 14, 39);
+    System.out.println(rmb);
+
+    rmb.sub(2, 13, 40);
+    System.out.println(rmb);
+
+    rmb.sub(2, 13, 40);
+    System.out.println(rmb);
   }
 }
 
@@ -10,23 +33,30 @@ class MixedRadix{
   List<Integer> bases;
   List<Integer> values;
 
-  public MixedRadix(int[] baseArray){
-    if(MixedRadix.isArrayNullOrZero(baseArray))
-      throw new IllegalArgumentException("base cannot be null or 0");
+  public MixedRadix(int... baseArray){
     initBases(baseArray);
     initValues();
   }
 
   private void initBases(int[] baseArray){
+    if(baseArray == null)
+      throw new IllegalArgumentException("base cannot be null or 0");
+
+    bases = new ArrayList<>(baseArray.length);
     int curBase = 1;
-    for(int base : baseArray){
+    for(int i = baseArray.length - 1; i >= 0; i--){
+      int base = baseArray[i];
+
+      if(base <= 0)
+        throw new IllegalArgumentException("base cannot be zero or negative");
+
       curBase *= base;
       bases.add(0, curBase);
     }
   }
 
   private void initValues(){
-    if(bases == null || bases.size() == 0)
+    if(bases == null)
       throw new IllegalArgumentException("init bases before init values");
     values = new ArrayList<>(Collections.nCopies(bases.size() + 1, 0));
   }
@@ -54,16 +84,16 @@ class MixedRadix{
     values.set(i, totalValue);
   }
 
-  public int[] add(int[] anotherValues){
-    if(!isValidValues(anotherValues))
+  public int[] add(int... anotherValues){
+    if(!isValueValid(anotherValues))
       throw new IllegalArgumentException("new value is not addable");
 
     addProcess(anotherValues);
     return getValues();
   }
 
-  public int[] sub(int[] anotherValues){
-    if(!isValidValues(anotherValues))
+  public int[] sub(int... anotherValues){
+    if(!isValueValid(anotherValues))
       throw new IllegalArgumentException("new value is not subtractable");
 
     int[] convertedAnotherValues = new int[anotherValues.length];
@@ -81,11 +111,18 @@ class MixedRadix{
     return result;
   }
 
-  private static boolean isArrayNullOrZero(int[] array){
-    return array == null || array.length == 0;
+  private boolean isValueValid(int[] anotherValues){
+    return anotherValues != null && anotherValues.length == values.size();
   }
 
-  private boolean isValidValues(int[] anotherValues){
-    return anotherValues != null && anotherValues.length == values.size();
+  public String toString(){
+    StringBuilder strBuilder = new StringBuilder("current value = ");
+    String prefix = "";
+    for(int value : values){
+      strBuilder.append(prefix);
+      prefix = ", ";
+      strBuilder.append(value);
+    }
+    return strBuilder.toString();
   }
 }
